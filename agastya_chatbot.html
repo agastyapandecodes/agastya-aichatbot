@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agastya-AI Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --color-bg-body-start: #1a202c;
+            --color-bg-body-end: #2d3748;
+            --color-chat-bg: #2d3748;
+            --color-chat-header-start: #4a5568;
+            --color-chat-header-end: #6b7280;
+            --color-text-primary: #e2e8f0;
+            --color-message-bg-user-start: #4299e1;
+            --color-message-bg-user-end: #3182ce;
+            --color-message-bg-bot-start: #718096;
+            --color-message-bg-bot-end: #5f6b7c;
+            --color-input-bg: #1a202c;
+            --color-input-placeholder: #a0aec0;
+            --color-input-focus-ring: #4299e1;
+            --color-button-bg-start: #4299e1;
+            --color-button-bg-end: #3182ce;
+            --color-button-hover-start: #3182ce;
+            --color-button-hover-end: #2c5282;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-scrollbar-track: #2d3748;
+            --color-scrollbar-thumb: #4a5568;
+            --color-scrollbar-thumb-hover: #6b7280;
+            --color-typing-indicator-bg: #5f6b7c;
+            --color-link: #4299e1;
+            --color-link-hover: #3182ce;
+            --color-icon-sun: #f6e05e;
+            --color-icon-moon: #90cdf4;
+            --color-toggle-hover-bg: rgba(255, 255, 255, 0.1);
+            --color-toggle-focus-ring: #4299e1;
+            --color-footer-bg: #4a5568;
+            --color-footer-border: #6b7280;
+        }
+
+        body.light-mode {
+            --color-bg-body-start: #f7fafc;
+            --color-bg-body-end: #edf2f7;
+            --color-chat-bg: #ffffff;
+            --color-chat-header-start: #cbd5e0;
+            --color-chat-header-end: #a0aec0;
+            --color-text-primary: #2d3748;
+            --color-message-bg-user-start: #63b3ed;
+            --color-message-bg-user-end: #4299e1;
+            --color-message-bg-bot-start: #e2e8f0;
+            --color-message-bg-bot-end: #cbd5e0;
+            --color-input-bg: #f7fafc;
+            --color-input-placeholder: #718096;
+            --color-input-focus-ring: #63b3ed;
+            --color-button-bg-start: #63b3ed;
+            --color-button-bg-end: #4299e1;
+            --color-button-hover-start: #4299e1;
+            --color-button-hover-end: #3182ce;
+            --color-border: rgba(0, 0, 0, 0.1);
+            --color-scrollbar-track: #edf2f7;
+            --color-scrollbar-thumb: #cbd5e0;
+            --color-scrollbar-thumb-hover: #a0aec0;
+            --color-typing-indicator-bg: #cbd5e0;
+            --color-link: #4299e1;
+            --color-link-hover: #3182ce;
+            --color-icon-sun: #f6e05e;
+            --color-icon-moon: #90cdf4;
+            --color-toggle-hover-bg: rgba(0, 0, 0, 0.1);
+            --color-toggle-focus-ring: #63b3ed;
+            --color-footer-bg: #e2e8f0;
+            --color-footer-border: #cbd5e0;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right bottom, var(--color-bg-body-start), var(--color-bg-body-end));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--color-text-primary);
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 550px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--color-chat-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        }
+
+        .chat-header {
+            background: linear-gradient(to right, var(--color-chat-header-start), var(--color-chat-header-end));
+            color: var(--color-text-primary);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        #theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        #theme-toggle:hover {
+            background-color: var(--color-toggle-hover-bg);
+        }
+        #theme-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--color-toggle-focus-ring);
+        }
+        #theme-toggle svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        #sun-icon {
+            color: var(--color-icon-sun);
+        }
+        #moon-icon {
+            color: var(--color-icon-moon);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scroll-behavior: smooth;
+            background-color: var(--color-input-bg);
+            position: relative;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--color-scrollbar-track);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--color-scrollbar-thumb);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--color-scrollbar-thumb-hover);
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.25rem;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: linear-gradient(to right, var(--color-message-bg-user-start), var(--color-message-bg-user-end));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .message.bot {
+            background: linear-gradient(to right, var(--color-message-bg-bot-start), var(--color-message-bg-bot-end));
+            color: var(--color-text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            background-color: var(--color-typing-indicator-bg);
+            color: var(--color-text-primary);
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        .typing-indicator.visible {
+            opacity: 1;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1.5rem;
+            background-color: var(--color-chat-header-start);
+            gap: 0.75rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 1rem 1.25rem;
+            border: none;
+            border-radius: 0.75rem;
+            background-color: var(--color-input-bg);
+            color: var(--color-text-primary);
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .chat-input input[type="text"]:focus {
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--color-input-focus-ring);
+        }
+
+        .chat-input input[type="text"]::placeholder {
+            color: var(--color-input-placeholder);
+        }
+
+        .chat-input button {
+            background: linear-gradient(to right, var(--color-button-bg-start), var(--color-button-bg-end));
+            color: white;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-input button:hover {
+            background: linear-gradient(to right, var(--color-button-hover-start), var(--color-button-hover-end));
+            transform: translateY(-2px);
+        }
+
+        .chat-input button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-footer {
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            background-color: var(--color-footer-bg);
+            border-top: 1px solid var(--color-footer-border);
+            border-bottom-left-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        }
+
+        .contact-link {
+            color: var(--color-link);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease-in-out;
+        }
+        .contact-link:hover {
+            color: var(--color-link-hover);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .chat-container {
+                height: 98vh;
+                border-radius: 0.75rem;
+            }
+            .chat-header {
+                font-size: 1.5rem;
+                padding: 1rem;
+                border-radius: 0.75rem 0.75rem 0 0;
+            }
+            #theme-toggle {
+                top: 0.75rem;
+                right: 0.75rem;
+                padding: 0.4rem;
+            }
+            #theme-toggle svg {
+                width: 1.2rem;
+                height: 1.2rem;
+            }
+            .chat-messages {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+            .message {
+                padding: 0.8rem 1rem;
+                border-radius: 1rem;
+            }
+            .chat-input {
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+            .chat-input input[type="text"] {
+                padding: 0.8rem 1rem;
+                border-radius: 0.5rem;
+            }
+            .chat-input button {
+                padding: 0.8rem 1.2rem;
+                border-radius: 0.5rem;
+            }
+            .chat-footer {
+                padding: 0.5rem 1rem;
+                border-radius: 0 0 0.75rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Agastya-AI Chatbot
+            <button id="theme-toggle">
+                <svg id="sun-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-1.414-1.414L13.5 4.5a1 1 0 001.414 1.414l.707-.707zM10 15a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4 0a1 1 0 01-1 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-.707-2.121l-.707.707a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414zM3 10a1 1 0 01-1-1V8a1 1 0 112 0v1a1 1 0 01-1 1zm0-4a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1z"></path></svg>
+                <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            </button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">Hello! I'm Agastya-AI. How can I assist you today?</div>
+            <div id="typing-indicator" class="typing-indicator">Agastya-AI is typing...</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Ask me anything...">
+            <button id="send-button">Send</button>
+        </div>
+        <div class="chat-footer">
+            <a href="mailto:agastyapandereal@gmail.com" class="contact-link">Contact Us: agastyapandereal@gmail.com</a>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        const apiKey = "AIzaSyBB-4MMEoA0eBdwZpq4iUD-LGP-HwgrL1o";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator(show) {
+            if (show) {
+                typingIndicator.classList.add('visible');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                typingIndicator.classList.remove('visible');
+            }
+        }
+
+        async function getBotResponse(userMessage) {
+            showTypingIndicator(true);
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+                const payload = { contents: chatHistory };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API Error:', errorData);
+                    return "Oops! I encountered an error. Please try again later.";
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.warn("Unexpected API response structure:", result);
+                    return "I'm having trouble understanding that. Could you rephrase?";
+                }
+            } catch (error) {
+                console.error("Error fetching from Gemini API:", error);
+                return "I'm sorry, I couldn't connect to my knowledge base. Please try again.";
+            } finally {
+                showTypingIndicator(false);
+            }
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') {
+                return;
+            }
+
+            appendMessage(message, 'user');
+            userInput.value = '';
+            userInput.disabled = true;
+            sendButton.disabled = true;
+
+            try {
+                const botResponse = await getBotResponse(message);
+                appendMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("Error in sendMessage:", error);
+                appendMessage("An unexpected error occurred.", 'bot');
+            } finally {
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function setTheme(isLightMode) {
+            if (isLightMode) {
+                document.body.classList.add('light-mode');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                document.body.classList.remove('light-mode');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !sendButton.disabled) {
+                sendMessage();
+            }
+        });
+
+        themeToggle.addEventListener('click', () => {
+            const isLightMode = document.body.classList.contains('light-mode');
+            setTheme(!isLightMode);
+        });
+
+        window.onload = () => {
+            userInput.focus();
+            showTypingIndicator(false);
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                setTheme(true);
+            } else {
+                setTheme(false);
+            }
+        };
+    </script>
+</body>
+</html>
